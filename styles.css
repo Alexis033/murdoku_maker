@@ -71,12 +71,6 @@ button.danger {
   color: #8e2b1e;
 }
 
-button.ghost.active {
-  background: #fff5f2;
-  border-color: #e5a196;
-  color: #8e2b1e;
-}
-
 .app-shell {
   height: 100vh;
   padding: 20px;
@@ -182,7 +176,6 @@ h2 {
 }
 
 .tab.active,
-.segmented.active,
 .editor-mode.active {
   background: var(--ink);
   color: white;
@@ -342,6 +335,10 @@ h2 {
   gap: 7px;
 }
 
+.editor-zone-legend {
+  margin-top: 10px;
+}
+
 .zone-key {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
@@ -410,10 +407,6 @@ h2 {
   white-space: nowrap;
 }
 
-.object-key .object-rule {
-  grid-column: 2;
-}
-
 .legend-object-icon {
   display: flex;
   align-items: center;
@@ -421,10 +414,6 @@ h2 {
   width: 24px;
   height: 24px;
   color: rgba(24,32,34,.7);
-}
-
-.legend-object-icon.blocked-object {
-  color: #8e2b1e;
 }
 
 .legend-object-icon img {
@@ -664,10 +653,6 @@ h2 {
   box-shadow: inset 0 0 0 4px rgba(180,70,56,.72);
 }
 
-.cell.solution-mark {
-  box-shadow: inset 0 0 0 4px rgba(40,111,108,.7);
-}
-
 .cell-victim {
   position: absolute;
   inset: 5px;
@@ -821,13 +806,6 @@ h2 {
   box-shadow: inset 0 0 0 2px rgba(40,111,108,.22);
 }
 
-.object-rule {
-  grid-column: 2;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-}
-
 .object-button-icon {
   display: flex;
   align-items: center;
@@ -969,45 +947,6 @@ h2 {
   }
 }
 
-.color-picker {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.color-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--line);
-  cursor: pointer;
-  padding: 0;
-  transition: transform .12s;
-}
-
-.color-swatch:hover {
-  transform: scale(1.15);
-}
-
-.color-swatch.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(40,111,108,.25);
-}
-
-.color-swatch-none {
-  background: #ddd;
-  position: relative;
-}
-
-.color-swatch-none::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border: 2px dashed #999;
-  border-radius: 50%;
-}
-
 .rotation-controls {
   display: flex;
   gap: 6px;
@@ -1030,7 +969,7 @@ h2 {
 }
 
 .rotation-controls button:hover {
-  background: var(--bg);
+  background: #eaeeef;
 }
 
 .size-controls {
