@@ -21,6 +21,19 @@ export function textureName(id) {
   return TEXTURES.find((texture) => texture.id === id)?.name || id;
 }
 
+export function applyTexturePreview(el, id) {
+  const url = textureUrlFor(id);
+  if (id === "plain" || !url) {
+    el.style.backgroundImage = "none";
+    el.style.backgroundColor = "var(--panel)";
+    el.style.backgroundSize = "";
+  } else {
+    el.style.backgroundImage = `url(${url})`;
+    el.style.backgroundColor = "";
+    el.style.backgroundSize = "cover";
+  }
+}
+
 export function regionName(item, index) {
   return item.regionNames[index] || `Zona ${index + 1}`;
 }
@@ -362,9 +375,37 @@ export function renderEditorModeButtons() {
   els.editorModeButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.mode === state.editorMode);
   });
+  clearRegionHighlight();
+}
+
+export function highlightRegion(item, zone) {
+  clearRegionHighlight();
+  const rows = item.regions.length;
+  const cols = item.regions[0]?.length || 0;
+  for (const cell of els.board.querySelectorAll(".cell")) {
+    const r = Number(cell.dataset.row);
+    const c = Number(cell.dataset.col);
+    if ((item.regions[r]?.[c] ?? -1) !== zone) continue;
+    cell.style.setProperty("--focus-top", r > 0 && (item.regions[r - 1]?.[c] ?? -1) === zone ? "0" : "4px");
+    cell.style.setProperty("--focus-right", c < cols - 1 && (item.regions[r]?.[c + 1] ?? -1) === zone ? "0" : "4px");
+    cell.style.setProperty("--focus-bottom", r < rows - 1 && (item.regions[r + 1]?.[c] ?? -1) === zone ? "0" : "4px");
+    cell.style.setProperty("--focus-left", c > 0 && (item.regions[r]?.[c - 1] ?? -1) === zone ? "0" : "4px");
+    cell.classList.add("zone-focus");
+  }
+}
+
+export function clearRegionHighlight() {
+  for (const cell of els.board.querySelectorAll(".cell.zone-focus")) {
+    cell.classList.remove("zone-focus");
+    cell.style.removeProperty("--focus-top");
+    cell.style.removeProperty("--focus-right");
+    cell.style.removeProperty("--focus-bottom");
+    cell.style.removeProperty("--focus-left");
+  }
 }
 
 export function renderEditorTools() {
+  clearRegionHighlight();
   const item = currentCase();
   if (state.editorMode === "region") {
     els.editorTools.innerHTML = `
@@ -381,13 +422,21 @@ export function renderEditorTools() {
         <span>Textura para ${state.selectedRegion == null ? "—" : escapeHtml(regionName(item, state.selectedRegion))}</span>
         <div class="texture-select-row">
           <span class="texture-preview" id="texturePreview" style="${textureBg(regionTexture(item, state.selectedRegion))}"></span>
-          <select id="regionTextureSelect">
-            ${[...TEXTURES].sort((a, b) => a.name.localeCompare(b.name)).map((texture) => `
-              <option value="${escapeAttr(texture.id)}"${texture.id === regionTexture(item, state.selectedRegion) ? " selected" : ""}>
-                ${escapeHtml(texture.name)}
-              </option>
-            `).join("")}
-          </select>
+          <div class="texture-dropdown-wrap">
+            <button class="texture-dropdown-trigger" id="textureDropdownTrigger" type="button">
+              <span class="texture-dropdown-trigger-swatch" style="${textureBg(regionTexture(item, state.selectedRegion))}"></span>
+              <span id="textureTriggerLabel">${escapeHtml(textureName(regionTexture(item, state.selectedRegion)))}</span>
+              <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="texture-dropdown-panel" id="textureDropdownPanel">
+              ${[...TEXTURES].sort((a, b) => a.name.localeCompare(b.name)).map((texture) => `
+                <button class="texture-option${texture.id === regionTexture(item, state.selectedRegion) ? " active" : ""}" data-texture="${escapeAttr(texture.id)}" type="button">
+                  <span class="texture-option-swatch" style="${textureBg(texture.id)}"></span>
+                  <span>${escapeHtml(texture.name)}</span>
+                </button>
+              `).join("")}
+            </div>
+          </div>
         </div>
       </label>
       <p class="label">Para eliminar una zona, borra su linea en el campo Zonas. Sus celdas vuelven a la primera zona.</p>
@@ -397,23 +446,64 @@ export function renderEditorTools() {
         state.selectedRegion = Number(button.dataset.region);
         renderEditorTools();
       });
+      button.addEventListener("mouseenter", () => {
+        highlightRegion(item, Number(button.dataset.region));
+      });
+      button.addEventListener("mouseleave", clearRegionHighlight);
     });
-    const textureSelect = document.getElementById("regionTextureSelect");
     const texturePreview = document.getElementById("texturePreview");
-    textureSelect?.addEventListener("change", () => {
-      item.regionTextures[state.selectedRegion] = textureSelect.value;
-      if (texturePreview) {
-        const tex = textureSelect.value;
-        const isPlain = tex === "plain";
-        texturePreview.style.backgroundImage = isPlain ? "none" : `url(${textureUrlFor(tex)})`;
-        texturePreview.style.backgroundColor = isPlain ? "var(--panel)" : "";
-        texturePreview.style.backgroundSize = isPlain ? "" : "cover";
-      }
+    const trigger = document.getElementById("textureDropdownTrigger");
+    const panel = document.getElementById("textureDropdownPanel");
+    const triggerLabel = document.getElementById("textureTriggerLabel");
+    let open = false;
+
+    function setTexture(id) {
+      item.regionTextures[state.selectedRegion] = id;
+      applyTexturePreview(texturePreview, id);
+      const swatch = trigger.querySelector(".texture-dropdown-trigger-swatch");
+      applyTexturePreview(swatch, id);
+      triggerLabel.textContent = textureName(id);
+      panel.querySelectorAll(".texture-option").forEach((opt) => opt.classList.toggle("active", opt.dataset.texture === id));
       saveCases();
       renderBoard();
       renderZoneLegend();
       setStatus(els.editorStatus, "Textura de zona actualizada.", "success");
+    }
+
+    function previewTexture(id) {
+      applyTexturePreview(texturePreview, id);
+    }
+
+    function openPanel() {
+      open = true;
+      panel.classList.add("open");
+    }
+
+    function closePanel() {
+      open = false;
+      panel.classList.remove("open");
+    }
+
+    function onEditorClick(e) {
+      if (open && !e.target.closest(".texture-dropdown-wrap")) {
+        closePanel();
+      }
+    }
+
+    trigger?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (open) closePanel(); else openPanel();
     });
+
+    panel?.querySelectorAll(".texture-option").forEach((opt) => {
+      opt.addEventListener("mouseenter", () => previewTexture(opt.dataset.texture));
+      opt.addEventListener("click", () => {
+        setTexture(opt.dataset.texture);
+        closePanel();
+      });
+    });
+
+    els.editorTools.addEventListener("click", onEditorClick);
   } else if (state.editorMode === "object") {
     els.editorTools.innerHTML = `
       <div class="object-palette">
