@@ -143,7 +143,7 @@ export function cellCanBeOccupied(item, row, col) {
 
 export function cellHtml(item, row, col) {
   const key = cellKey(row, col);
-  const suspectId = state.reveal ? solutionAt(item, row, col) : state.board[key];
+  const suspectId = state.reveal ? solutionAt(item, row, col) : (state.mode === "editor" && state.editorMode === "solution" ? solutionAt(item, row, col) : state.board[key]);
   const suspect = item.suspects.find((entry) => entry.id === suspectId);
   const rawObject = item.objects[key];
   const object = !rawObject ? null : rawObject.ref ? null : typeof rawObject === "string" ? { id: rawObject, color: null, rotation: 0 } : rawObject;
@@ -212,9 +212,6 @@ export function renderBoard() {
       if (unavailable.has(key)) button.classList.add("unavailable");
       if (conflicts.has(key)) button.classList.add("conflict");
       if (checkMap[key]) button.classList.add(checkMap[key]);
-      if (state.mode === "editor" && state.editorMode === "solution" && solutionAt(item, row, col)) {
-        button.classList.add("solution-mark");
-      }
       const mainObj = item.objects[key];
       if (mainObj && typeof mainObj === "object" && !mainObj.ref && ((mainObj.w || 1) > 1 || (mainObj.h || 1) > 1)) {
         button.style.zIndex = "2";
