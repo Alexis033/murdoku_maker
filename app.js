@@ -1,4 +1,4 @@
-import { state, els } from "./src/state.js";
+import { state, els, currentCase } from "./src/state.js";
 import { renderAll, renderBoard, renderPlayPanel, renderBoardSize, setStatus } from "./src/render.js";
 import { renderEditorTools, renderEditorModeButtons } from "./src/render.js";
 import { handleCellClick, verifyBoard, resetProgress, clearBoardPieces, elapsedSeconds } from "./src/game.js";
@@ -57,6 +57,37 @@ function bindEvents() {
       handleCellClick(row, col);
     }
   });
+  let hoverKey = null;
+  function highlightZone(row, col) {
+    clearZoneHighlight();
+    const item = currentCase();
+    if (!item) return;
+    const zone = item.regions?.[row]?.[col];
+    if (zone === undefined) return;
+    hoverKey = `${row},${col}`;
+    for (const cell of els.board.querySelectorAll(".cell")) {
+      const r = Number(cell.dataset.row);
+      const c = Number(cell.dataset.col);
+      if ((item.regions[r]?.[c] ?? -1) === zone) {
+        cell.classList.add("zone-focus");
+      }
+    }
+  }
+  function clearZoneHighlight() {
+    hoverKey = null;
+    for (const cell of els.board.querySelectorAll(".cell.zone-focus")) {
+      cell.classList.remove("zone-focus");
+    }
+  }
+  els.board.addEventListener("mouseover", (e) => {
+    const cell = e.target.closest(".cell");
+    if (!cell) return;
+    const key = `${cell.dataset.row},${cell.dataset.col}`;
+    if (key === hoverKey) return;
+    highlightZone(Number(cell.dataset.row), Number(cell.dataset.col));
+  });
+  els.board.addEventListener("mouseleave", clearZoneHighlight);
+
   els.clearCellBtn.addEventListener("click", clearBoardPieces);
   els.duplicateCaseBtn.addEventListener("click", duplicateCase);
   els.deleteCaseBtn.addEventListener("click", deleteCase);

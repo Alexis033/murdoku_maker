@@ -51,7 +51,10 @@ export const DEFAULT_OBJECT_RULES = {
 
 export const OBJECTS = [
   { id: "box", png: false, name: "caja" },
-  { id: "plant", png: true, name: "planta" }
+  { id: "couch", png: true, name: "sofa" },
+  { id: "horizontal_table", png: true, name: "mesa horizontal" },
+  { id: "plant", png: true, name: "planta" },
+  { id: "vertical_table", png: true, name: "mesa vertical", h: 2 },
 ];
 
 export const TEXTURES = [
@@ -65,7 +68,7 @@ export function objectAssetForKey(key) {
   const exact = {
     arbol: "tree", arbusto: "bush", banco: "bench", agua: "water", fuente: "fountain",
     mesa: "table", silla: "chair", flor: "flower", caja: "box", puerta: "door",
-    ventana: "window", piedra: "rock", lampara: "lamp", cama: "bed", sofa: "sofa",
+    ventana: "window", piedra: "rock", lampara: "lamp", cama: "bed", sofa: "couch",
     alfombra: "rug", estante: "shelf", librero: "bookcase", gabinete: "cabinet",
     fregadero: "sink", estufa: "stove", refrigerador: "fridge", barril: "barrel",
     estatua: "statue", fogata: "campfire", pozo: "well", escalera: "stairs",
@@ -76,7 +79,7 @@ export function objectAssetForKey(key) {
     ["arbol", "tree"], ["arbust", "bush"], ["banco", "bench"], ["agua", "water"], ["lago", "water"],
     ["estanque", "water"], ["fuente", "fountain"], ["mesa", "table"], ["silla", "chair"], ["flor", "flower"],
     ["caja", "box"], ["puerta", "door"], ["ventana", "window"], ["piedra", "rock"], ["roca", "rock"],
-    ["lampara", "lamp"], ["cama", "bed"], ["sofa", "sofa"], ["alfombra", "rug"], ["estante", "shelf"],
+    ["lampara", "lamp"], ["cama", "bed"], ["sofa", "couch"], ["alfombra", "rug"], ["estante", "shelf"],
     ["librero", "bookcase"], ["libro", "bookcase"], ["gabinete", "cabinet"], ["fregadero", "sink"],
     ["lavabo", "sink"], ["estufa", "stove"], ["refrigerador", "fridge"], ["nevera", "fridge"],
     ["barril", "barrel"], ["estatua", "statue"], ["fogata", "campfire"], ["pozo", "well"],

@@ -310,8 +310,9 @@ h2 {
 }
 
 .legend-object-icon {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
   height: 24px;
   color: rgba(24,32,34,.7);
@@ -321,8 +322,14 @@ h2 {
   color: #8e2b1e;
 }
 
-.legend-object-icon svg,
 .legend-object-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+.legend-object-icon svg {
   width: 100%;
   height: 100%;
   fill: none;
@@ -519,36 +526,49 @@ h2 {
   padding: 4px;
 }
 
-.cell.zone-top {
+.cell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.cell.zone-top::before {
   border-top: 3px solid #172023;
 }
 
-.cell.zone-right {
+.cell.zone-right::before {
   border-right: 3px solid #172023;
 }
 
-.cell.zone-bottom {
+.cell.zone-bottom::before {
   border-bottom: 3px solid #172023;
 }
 
-.cell.zone-left {
+.cell.zone-left::before {
   border-left: 3px solid #172023;
 }
 
-.cell.edge-top {
+.cell.edge-top::before {
   border-top: 3px solid #050708;
 }
 
-.cell.edge-right {
+.cell.edge-right::before {
   border-right: 3px solid #050708;
 }
 
-.cell.edge-bottom {
+.cell.edge-bottom::before {
   border-bottom: 3px solid #050708;
 }
 
-.cell.edge-left {
+.cell.edge-left::before {
   border-left: 3px solid #050708;
+}
+
+.cell.zone-focus {
+  outline: 3px solid rgba(68, 114, 196, 0.65);
+  outline-offset: -2px;
 }
 
 .cell.texture-plain {
@@ -625,8 +645,9 @@ h2 {
 .cell-object {
   position: absolute;
   inset: 6px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #111719;
   pointer-events: none;
   opacity: .92;
@@ -635,9 +656,10 @@ h2 {
 }
 
 .cell-object img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 }
 
 .cell-object > svg {
@@ -789,16 +811,19 @@ h2 {
 }
 
 .object-button-icon {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 28px;
   height: 28px;
 }
 
 .object-button-icon img,
 .object-button-icon svg {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 }
 
 .empty-object-icon {

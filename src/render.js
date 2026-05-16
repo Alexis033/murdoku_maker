@@ -441,13 +441,11 @@ export function renderEditorTools() {
           <span>Tamaño (ancho x alto)</span>
           <div class="size-controls">
             <select id="sizeWSelect">
-              <option value="1"${state.selectedObjectW === 1 ? " selected" : ""}>1</option>
-              <option value="2"${state.selectedObjectW === 2 ? " selected" : ""}>2</option>
+              ${[1,2,3,4].map((v) => `<option value="${v}"${state.selectedObjectW === v ? " selected" : ""}>${v}</option>`).join("")}
             </select>
             <span>x</span>
             <select id="sizeHSelect">
-              <option value="1"${state.selectedObjectH === 1 ? " selected" : ""}>1</option>
-              <option value="2"${state.selectedObjectH === 2 ? " selected" : ""}>2</option>
+              ${[1,2,3,4].map((v) => `<option value="${v}"${state.selectedObjectH === v ? " selected" : ""}>${v}</option>`).join("")}
             </select>
           </div>
         </label>
@@ -461,6 +459,13 @@ export function renderEditorTools() {
     els.editorTools.querySelectorAll("[data-object]").forEach((button) => {
       button.addEventListener("click", () => {
         state.selectedObject = button.dataset.object;
+        if (state.selectedObject) {
+          const obj = OBJECTS.find((o) => o.id === state.selectedObject);
+          if (obj) {
+            if (obj.w) state.selectedObjectW = obj.w;
+            if (obj.h) state.selectedObjectH = obj.h;
+          }
+        }
         renderEditorTools();
       });
     });
