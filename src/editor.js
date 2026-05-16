@@ -8,6 +8,7 @@ import { stopTimer } from "./game.js";
 import { uniqueBoardPlacements } from "./rules.js";
 import { readJson } from "./utils.js";
 import { PROGRESS_KEY } from "./state.js";
+import { generateCase } from "./generator.js";
 
 export function editCell(row, col) {
   const item = currentCase();
@@ -234,6 +235,17 @@ export function saveEditorCase() {
   saveCases();
   renderAll();
   setStatus(els.editorStatus, "Caso guardado.", "success");
+}
+
+export function generateNewCase() {
+  const rows = clamp(Number(els.editRows.value) || 6, MIN_SIZE, MAX_SIZE);
+  const cols = clamp(Number(els.editCols.value) || rows, MIN_SIZE, MAX_SIZE);
+  const newCase = generateCase(rows, cols);
+  state.cases.push(newCase);
+  state.caseId = newCase.id;
+  saveCases();
+  loadCurrentCase(newCase.id);
+  renderAll();
 }
 
 export function createNewCase() {

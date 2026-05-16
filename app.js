@@ -3,7 +3,7 @@ import { renderAll, renderBoard, renderPlayPanel, renderBoardSize, setStatus } f
 import { renderEditorTools, renderEditorModeButtons } from "./src/render.js";
 import { handleCellClick, verifyBoard, resetProgress, clearBoardPieces, elapsedSeconds } from "./src/game.js";
 import { updateCaseTextFields, updateCaseSuspects, updateCaseClues, updateCaseRegions, updateCaseDimensions } from "./src/editor.js";
-import { saveEditorCase, createNewCase, duplicateCase, deleteCase, exportCurrentCase, importCase } from "./src/editor.js";
+import { saveEditorCase, createNewCase, generateNewCase, duplicateCase, deleteCase, exportCurrentCase, importCase } from "./src/editor.js";
 import { editCell, loadCurrentCase, switchMode } from "./src/editor.js";
 import { persistProgress } from "./src/persist.js";
 import { normalizeCase } from "./src/normalize.js";
@@ -18,7 +18,7 @@ function bindElements() {
     "timerLabel", "sizeLabel", "verifyBtn", "revealBtn",
     "resetBtn", "zoomRange", "zoneLegend", "objectLegend", "suspectCards", "statusBox",
     "editTitle", "editDifficulty", "editRows", "editCols",
-    "newCaseBtn", "saveCaseBtn", "exportCaseBtn", "importCaseInput",
+    "generateCaseBtn", "newCaseBtn", "saveCaseBtn", "exportCaseBtn", "importCaseInput",
     "editSuspects", "editClues", "editRegions", "editorTools", "editorStatus",
     "board", "selectedLabel", "clearCellBtn"
   ].forEach((id) => els[id] = document.getElementById(id));
@@ -96,6 +96,7 @@ function bindEvents() {
   els.clearCellBtn.addEventListener("click", clearBoardPieces);
   els.duplicateCaseBtn.addEventListener("click", duplicateCase);
   els.deleteCaseBtn.addEventListener("click", deleteCase);
+  els.generateCaseBtn.addEventListener("click", generateNewCase);
   els.newCaseBtn.addEventListener("click", createNewCase);
   els.saveCaseBtn.addEventListener("click", saveEditorCase);
   els.exportCaseBtn.addEventListener("click", exportCurrentCase);
