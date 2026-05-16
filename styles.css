@@ -188,6 +188,7 @@ h2 {
 .panel.active {
   display: block;
   overflow: auto;
+  scrollbar-gutter: stable;
 }
 
 .stat-row {
