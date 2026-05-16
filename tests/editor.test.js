@@ -24,6 +24,8 @@ vi.mock("../src/game.js", () => ({
 
 import { state, currentCase } from "../src/state.js";
 import { editCell } from "../src/editor.js";
+import { saveCases } from "../src/persist.js";
+import { renderBoard } from "../src/render.js";
 
 function makeCase(overrides = {}) {
   return {
@@ -55,6 +57,7 @@ beforeEach(() => {
   state.selectedObjectW = 1;
   state.selectedObjectH = 1;
   state.selectedObjectRotation = 0;
+  vi.clearAllMocks();
 });
 
 describe("editCell — object mode", () => {
@@ -149,6 +152,15 @@ describe("editCell — victim mode", () => {
     editCell(4, 2);
     expect(currentCase().victim.row).toBe(4);
     expect(currentCase().victim.col).toBe(2);
+  });
+});
+
+describe("editCell — side effects", () => {
+  it("persists and re-renders after every edit", () => {
+    state.selectedObject = "box";
+    editCell(2, 3);
+    expect(saveCases).toHaveBeenCalledOnce();
+    expect(renderBoard).toHaveBeenCalledOnce();
   });
 });
 
