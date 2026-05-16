@@ -141,7 +141,7 @@ export function cellCanBeOccupied(item, row, col) {
   return objectCanBeOccupied(item, id);
 }
 
-export function cellHtml(item, row, col) {
+export function cellHtml(item, row, col, zoneLabel) {
   const key = cellKey(row, col);
   const suspectId = state.reveal ? solutionAt(item, row, col) : (state.mode === "editor" && state.editorMode === "solution" ? solutionAt(item, row, col) : state.board[key]);
   const suspect = item.suspects.find((entry) => entry.id === suspectId);
@@ -163,6 +163,7 @@ export function cellHtml(item, row, col) {
     }
   }
   return `
+    ${zoneLabel ? `<span class="zone-label">${escapeHtml(zoneLabel)}</span>` : ""}
     ${object ? `<span class="cell-object ${blocked ? "blocked-object" : ""}" title="${escapeAttr(objectLabel(item, object.id))}"${objStyle ? ` style="${objStyle}"` : ""}>${objectIcon(object.id, object.color)}</span>` : ""}
     ${hasVictim ? `<span class="cell-victim">${escapeHtml((item.victim.name || "V").slice(0, 1))}</span>` : ""}
     ${suspect ? `
@@ -195,6 +196,7 @@ export function renderBoard() {
   const checkMap = state.lastCheck?.cells || {};
 
   els.board.innerHTML = "";
+  const labeledZones = new Set();
   for (let row = 0; row < item.rows; row += 1) {
     for (let col = 0; col < item.cols; col += 1) {
       const key = cellKey(row, col);
@@ -216,7 +218,8 @@ export function renderBoard() {
       if (mainObj && typeof mainObj === "object" && !mainObj.ref && ((mainObj.w || 1) > 1 || (mainObj.h || 1) > 1)) {
         button.style.zIndex = "2";
       }
-      button.innerHTML = cellHtml(item, row, col);
+      const zoneLabel = labeledZones.has(region) ? "" : (labeledZones.add(region), regionName(item, region));
+      button.innerHTML = cellHtml(item, row, col, zoneLabel);
       els.board.appendChild(button);
     }
   }
