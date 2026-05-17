@@ -108,8 +108,8 @@ describe("normalizeObjectRules", () => {
 
   it("adds objects from the objects map", () => {
     const result = normalizeObjectRules(null, { "0,0": "my_custom_obj" }, false);
-    expect(result["my-custom-obj"]).toBeDefined();
-    expect(result["my-custom-obj"].name).toBe("my_custom_obj");
+    expect(result["my_custom_obj"]).toBeDefined();
+    expect(result["my_custom_obj"].name).toBe("my_custom_obj");
   });
 });
 

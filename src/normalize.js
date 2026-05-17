@@ -51,7 +51,7 @@ export function normalizeObjectRules(rules, objects, includeDefaults = false) {
   const next = includeDefaults ? structuredClone(DEFAULT_OBJECT_RULES) : {};
   if (rules && typeof rules === "object") {
     for (const [key, value] of Object.entries(rules)) {
-      const id = makeId(value?.name || key);
+      const id = String(key).toLowerCase().trim();
       if (!id) continue;
       next[id] = {
         name: value?.name || key,
@@ -61,8 +61,9 @@ export function normalizeObjectRules(rules, objects, includeDefaults = false) {
   }
   for (const raw of Object.values(objects || {})) {
     const name = typeof raw === "string" ? raw : (raw.id || "");
-    const id = makeId(name);
-    if (id && !next[id]) next[id] = { name, occupiable: true };
+    if (!name) continue;
+    const id = name;
+    if (!next[id]) next[id] = { name, occupiable: true };
   }
   return next;
 }

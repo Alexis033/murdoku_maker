@@ -177,7 +177,7 @@ export function cellHtml(item, row, col, zoneLabel) {
   }
   return `
     ${zoneLabel ? `<span class="zone-label">${escapeHtml(zoneLabel)}</span>` : ""}
-    ${object ? `<span class="cell-object ${blocked ? "blocked-object" : ""}" title="${escapeAttr(objectLabel(item, object.id))}"${objStyle ? ` style="${objStyle}"` : ""}>${objectIcon(object.id, object.color)}</span>` : ""}
+    ${object ? `<span class="cell-object ${blocked ? "blocked-object" : "occupiable-object"}" title="${escapeAttr(objectLabel(item, object.id))}"${objStyle ? ` style="${objStyle}"` : ""}>${objectIcon(object.id, object.color)}</span>` : ""}
     ${hasVictim ? `<span class="cell-victim">${escapeHtml((item.victim.name || "V").slice(0, 1))}</span>` : ""}
     ${suspect ? `
       <span class="cell-person">
@@ -511,22 +511,6 @@ export function renderEditorTools() {
   } else if (state.editorMode === "object") {
     els.editorRegionBar.innerHTML = "";
     els.editorTools.innerHTML = `
-      <div class="object-palette">
-        <button class="object-button ${!state.selectedObject ? "active" : ""}" data-object="" type="button">
-          <span class="object-button-icon empty-object-icon"></span>
-          <span>sin objeto</span>
-        </button>
-        ${OBJECTS.map((obj) => {
-          const id = obj.id;
-          const active = state.selectedObject === id;
-          return `
-          <button class="object-button ${active ? "active" : ""}" data-object="${escapeAttr(id)}" type="button">
-            <span class="object-button-icon"><img src="assets/objects/${escapeAttr(id)}.${obj.png ? "png" : "svg"}" alt="" draggable="false" class="object-preview-img"></span>
-            <span>${escapeHtml(obj.name)}</span>
-          </button>
-        `}).join("")}
-      </div>
-      ${state.selectedObject ? `
       <div class="object-controls">
         <label class="field">
           <span>Rotacion</span>
@@ -554,7 +538,21 @@ export function renderEditorTools() {
           <span>Bloqueado (no se puede ocupar)</span>
         </label>
       </div>
-      ` : ""}
+      <div class="object-palette">
+        <button class="object-button ${!state.selectedObject ? "active" : ""}" data-object="" type="button">
+          <span class="object-button-icon empty-object-icon"></span>
+          <span>sin objeto</span>
+        </button>
+        ${OBJECTS.map((obj) => {
+          const id = obj.id;
+          const active = state.selectedObject === id;
+          return `
+          <button class="object-button ${active ? "active" : ""}" data-object="${escapeAttr(id)}" type="button">
+            <span class="object-button-icon"><img src="assets/objects/${escapeAttr(id)}.${obj.png ? "png" : "svg"}" alt="" draggable="false" class="object-preview-img"></span>
+            <span>${escapeHtml(obj.name)}</span>
+          </button>
+        `}).join("")}
+      </div>
     `;
     els.editorTools.querySelectorAll("[data-object]").forEach((button) => {
       button.addEventListener("click", () => {
