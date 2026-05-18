@@ -20,6 +20,7 @@ function makeCase() {
     objects: {},
     objectRules: {},
     clues: [],
+    generalClues: "",
     solution: { ana: { row: 1, col: 1 } },
     murderer: "ana",
   };

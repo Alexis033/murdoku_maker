@@ -451,6 +451,26 @@ h2 {
   text-overflow: ellipsis;
 }
 
+.general-clues {
+  margin-top: 16px;
+}
+
+.clue-list {
+  display: grid;
+  gap: 6px;
+}
+
+.clue-item {
+  margin: 0;
+  padding: 8px 10px;
+  background: #faf6ed;
+  border: 1px solid #d4c9b8;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #2c1810;
+}
+
 .zone-legend,
 .object-legend {
   display: grid;
@@ -878,6 +898,10 @@ h2 {
 .editor-tools {
   display: grid;
   gap: 10px;
+}
+
+#suspectClueFields {
+  margin-top: 16px;
 }
 
 .editor-region-bar:not(:empty) {

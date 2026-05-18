@@ -199,5 +199,6 @@ export const sampleCase = {
     elena: { row: 4, col: 1 },
     felix: { row: 5, col: 3 }
   },
+  generalClues: "Cada sospechoso ocupa una fila y una columna distintas.\nLa victima esta en el patio central.",
   murderer: "carissa"
 };

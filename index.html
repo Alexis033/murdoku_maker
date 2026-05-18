@@ -56,6 +56,7 @@
 
             <h2>Sospechosos</h2>
             <div id="suspectCards" class="suspect-cards"></div>
+            <div id="generalCluesPanel" class="general-clues"></div>
           </section>
 
           <section id="editorPanel" class="panel" aria-label="Editor de casos">
@@ -104,16 +105,17 @@
                 <span>Sospechosos, uno por linea</span>
                 <textarea id="editSuspects" rows="6"></textarea>
               </label>
-
+              
+              <label class="field">
+                <span>Genero (m/f) de imagen, uno por sospechoso</span>
+                <textarea id="editGenders" rows="3" placeholder="m / f / vacio=auto"></textarea>
+              </label>
+              
               <label class="field">
                 <span>Pistas, una por sospechoso</span>
                 <textarea id="editClues" rows="5"></textarea>
               </label>
 
-              <label class="field">
-                <span>Genero (m/f), uno por sospechoso</span>
-                <textarea id="editGenders" rows="3" placeholder="m / f / vacio=auto"></textarea>
-              </label>
             </div>
 
             <div id="editRegionsField">

@@ -22,7 +22,8 @@ function bindElements() {
     "generateCaseBtn", "newCaseBtn", "saveCaseBtn", "exportCaseBtn", "importCaseInput",
     "editSuspects", "editClues", "editGenders", "editRegions", "editorTools", "editorRegionBar", "editorStatus",
     "suspectClueFields", "editRegionsField",
-    "board", "selectedLabel", "clearCellBtn"
+    "board", "selectedLabel", "clearCellBtn",
+    "generalCluesPanel"
   ].forEach((id) => els[id] = document.getElementById(id));
   els.editorModeButtons = Array.from(document.querySelectorAll(".editor-mode"));
 }

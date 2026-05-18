@@ -325,12 +325,21 @@ export function renderSelectedLabel() {
   else els.selectedLabel.textContent = suspect ? `Seleccionado: ${suspect.name}` : "Selecciona un sospechoso";
 }
 
+export function renderGeneralClues() {
+  const item = currentCase();
+  const clues = (item.generalClues || "").trim();
+  els.generalCluesPanel.innerHTML = clues
+    ? `<h2>Pistas</h2><div class="clue-list">${clues.split("\n").map((line) => `<p class="clue-item">${escapeHtml(line)}</p>`).join("")}</div>`
+    : "";
+}
+
 export function renderPlayPanel() {
   const item = currentCase();
   els.difficultyLabel.textContent = item.difficulty;
   els.sizeLabel.textContent = `${item.rows}x${item.cols}`;
   els.revealBtn.textContent = state.reveal ? "Ocultar" : "Solucion";
   renderSuspectCards();
+  renderGeneralClues();
   renderSelectedLabel();
   updateTimerLabel();
   if (!state.lastCheck) {
@@ -732,6 +741,10 @@ export function renderEditorTools() {
           `).join("")}
         </select>
       </label>
+      <label class="field">
+        <span>Pistas generales (una por linea)</span>
+        <textarea id="editGeneralClues" rows="4">${escapeHtml(item.generalClues || "")}</textarea>
+      </label>
       <div class="solution-list">
         ${item.suspects.map((suspect) => {
           const pos = item.solution[suspect.id];
@@ -757,6 +770,11 @@ export function renderEditorTools() {
       item.murderer = murdererSelect.value;
       saveCases();
       editorSuccess("Asesino actualizado.");
+    });
+    const editGeneralClues = document.getElementById("editGeneralClues");
+    editGeneralClues?.addEventListener("input", () => {
+      item.generalClues = editGeneralClues.value;
+      saveCases();
     });
   }
 }

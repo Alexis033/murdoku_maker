@@ -43,6 +43,7 @@ function makeCase(overrides = {}) {
     objects: {},
     objectRules: {},
     clues: [],
+    generalClues: "",
     solution: {},
     murderer: "ana",
     ...overrides,

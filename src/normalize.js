@@ -101,6 +101,7 @@ export function normalizeCase(input) {
   remapInvalidRegions(item);
   item.objects = item.objects || {};
   item.objectRules = normalizeObjectRules(item.objectRules, item.objects, true);
+  item.generalClues = item.generalClues || "";
   item.solution = item.solution || {};
   item.murderer = item.murderer || item.suspects[0]?.id || "";
   return item;
