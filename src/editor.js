@@ -27,6 +27,28 @@ export function editCell(row, col) {
   if (state.editorMode === "region") {
     item.regions[row][col] = state.selectedRegion;
   } else if (state.editorMode === "object") {
+    const raw = item.objects[key];
+    if (raw) {
+      if (raw && raw.ref) {
+        const anchorKey = raw.ref;
+        for (const [k, v] of Object.entries(item.objects)) {
+          if (k === anchorKey || (v && v.ref === anchorKey)) delete item.objects[k];
+        }
+      } else {
+        const { w, h } = getObjectSize(raw);
+        const rot = typeof raw === "object" ? (raw.rotation || 0) : 0;
+        const { w: sw, h: sh } = rotatedSize(w, h, rot);
+        const { row: ar, col: ac } = parseCellKey(key);
+        for (let dr = 0; dr < sh; dr++) {
+          for (let dc = 0; dc < sw; dc++) {
+            delete item.objects[cellKey(ar + dr, ac + dc)];
+          }
+        }
+      }
+      saveCases();
+      renderBoard();
+      return;
+    }
     if (state.selectedObject) {
       function clearArea(r, c, sw, sh) {
         for (let dr = 0; dr < sh; dr++) {
@@ -69,26 +91,6 @@ export function editCell(row, col) {
             item.objects[k] = { ref: key };
           }
         }
-      }
-    } else {
-      const raw = item.objects[key];
-      if (raw && raw.ref) {
-        const anchorKey = raw.ref;
-        for (const [k, v] of Object.entries(item.objects)) {
-          if (k === anchorKey || (v && v.ref === anchorKey)) delete item.objects[k];
-        }
-      } else if (raw) {
-        const { w, h } = getObjectSize(raw);
-        const rot = typeof raw === "object" ? (raw.rotation || 0) : 0;
-        const { w: sw, h: sh } = rotatedSize(w, h, rot);
-        const { row: ar, col: ac } = parseCellKey(key);
-        for (let dr = 0; dr < sh; dr++) {
-          for (let dc = 0; dc < sw; dc++) {
-            delete item.objects[cellKey(ar + dr, ac + dc)];
-          }
-        }
-      } else {
-        delete item.objects[key];
       }
     }
   } else if (state.editorMode === "victim") {
