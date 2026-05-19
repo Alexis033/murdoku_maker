@@ -717,8 +717,7 @@ h2 {
   border-left: 5px solid #050708;
 }
 
-.cell.zone-focus::after {
-  content: "";
+.zone-focus-bar {
   position: absolute;
   inset: 0;
   pointer-events: none;

@@ -127,21 +127,23 @@ function bindEvents() {
       const r = Number(cell.dataset.row);
       const c = Number(cell.dataset.col);
       if ((item.regions[r]?.[c] ?? -1) !== zone) continue;
-      cell.style.setProperty("--focus-top", r > 0 && (item.regions[r - 1]?.[c] ?? -1) === zone ? "0" : "4px");
-      cell.style.setProperty("--focus-right", c < cols - 1 && (item.regions[r]?.[c + 1] ?? -1) === zone ? "0" : "4px");
-      cell.style.setProperty("--focus-bottom", r < rows - 1 && (item.regions[r + 1]?.[c] ?? -1) === zone ? "0" : "4px");
-      cell.style.setProperty("--focus-left", c > 0 && (item.regions[r]?.[c - 1] ?? -1) === zone ? "0" : "4px");
-      cell.classList.add("zone-focus");
+      const bar = document.createElement("span");
+      bar.className = "zone-focus-bar";
+      const t = r > 0 && (item.regions[r - 1]?.[c] ?? -1) === zone ? "0" : "4px";
+      const r_ = c < cols - 1 && (item.regions[r]?.[c + 1] ?? -1) === zone ? "0" : "4px";
+      const b = r < rows - 1 && (item.regions[r + 1]?.[c] ?? -1) === zone ? "0" : "4px";
+      const l = c > 0 && (item.regions[r]?.[c - 1] ?? -1) === zone ? "0" : "4px";
+      bar.style.setProperty("--focus-top", t);
+      bar.style.setProperty("--focus-right", r_);
+      bar.style.setProperty("--focus-bottom", b);
+      bar.style.setProperty("--focus-left", l);
+      cell.appendChild(bar);
     }
   }
   function clearZoneHighlight() {
     hoverKey = null;
-    for (const cell of els.board.querySelectorAll(".cell.zone-focus")) {
-      cell.classList.remove("zone-focus");
-      cell.style.removeProperty("--focus-top");
-      cell.style.removeProperty("--focus-right");
-      cell.style.removeProperty("--focus-bottom");
-      cell.style.removeProperty("--focus-left");
+    for (const bar of els.board.querySelectorAll(".zone-focus-bar")) {
+      bar.remove();
     }
   }
   els.board.addEventListener("mouseover", (e) => {
