@@ -99,6 +99,16 @@ describe("handleCellClick", () => {
     expect(state.victimGuess).toBe("3,4");
   });
 
+  it("placing victim clears drafts on same row and column", () => {
+    state.draft["3,0"] = "ana";
+    state.draft["0,4"] = "bruno";
+    state.selectedSuspect = "__victim__";
+    handleCellClick(3, 4);
+    expect(state.victimGuess).toBe("3,4");
+    expect(state.draft["3,0"]).toBeUndefined();
+    expect(state.draft["0,4"]).toBeUndefined();
+  });
+
   it("toggles victim off when clicking same cell", () => {
     state.selectedSuspect = "__victim__";
     state.victimGuess = "3,4";

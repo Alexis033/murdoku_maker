@@ -85,6 +85,12 @@ export function handleCellClick(row, col) {
       return;
     }
     state.victimGuess = state.victimGuess === key ? "" : key;
+    if (state.victimGuess) {
+      for (const [k, sid] of Object.entries(state.draft)) {
+        const { row: r, col: c } = parseCellKey(k);
+        if (r === row || c === col) delete state.draft[k];
+      }
+    }
     state.lastCheck = null;
     persistProgress(elapsedSeconds());
     renderBoard();
