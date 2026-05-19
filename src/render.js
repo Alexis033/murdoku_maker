@@ -202,60 +202,97 @@ export function renderBoardSize() {
 export function renderBoard() {
   const item = gameCase();
   if (!item) return;
-  els.board.style.setProperty("--cols", item.cols);
+  const prevCols = els.board.style.getPropertyValue("--cols");
+  const colsChanged = prevCols !== String(item.cols);
+  if (colsChanged) els.board.style.setProperty("--cols", item.cols);
   renderBoardSize();
   const conflicts = findLineConflicts(state.board);
   const unavailable = state.mode !== "play" ? new Set() : computeUnavailableCells({
     board: state.board, cellKey, cols: item.cols, rows: item.rows, victimGuess: state.victimGuess
   });
   const checkMap = state.lastCheck?.cells || {};
+  const victimKey = state.reveal ? cellKey(item.victim.row, item.victim.col) : state.victimGuess;
 
-  els.board.innerHTML = "";
+  const existing = els.board.querySelectorAll(":scope > .cell");
+  const totalCells = item.rows * item.cols;
+  const sizeChanged = existing.length !== totalCells;
+  const firstRender = existing.length === 0;
+
+  if (sizeChanged && !firstRender) {
+    // board dimensions changed — full rebuild
+    els.board.innerHTML = "";
+    renderBoard();
+    return;
+  }
+
   const labeledZones = new Set();
   for (let row = 0; row < item.rows; row += 1) {
     for (let col = 0; col < item.cols; col += 1) {
       const key = cellKey(row, col);
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "cell";
-      button.dataset.row = String(row);
-      button.dataset.col = String(col);
       const region = item.regions[row]?.[col] || 0;
-      button.style.setProperty("--region-color", COLORS[region % COLORS.length]);
-      { const texId = regionTexture(item, region); if (texId === "plain") { button.classList.add("texture-plain"); } else { const url = textureUrlFor(texId); if (url) button.style.backgroundImage = `url(${url})`; } }
-      button.classList.add(...cellBorderClasses(item, row, col, region));
-      button.title = regionName(item, region);
-      if (!cellCanBeOccupied(item, row, col)) button.classList.add("blocked");
-      if (unavailable.has(key)) button.classList.add("unavailable");
-      if (conflicts.has(key)) button.classList.add("conflict");
-      if (checkMap[key]) button.classList.add(checkMap[key]);
-      const draftId = state.mode === "play" && !state.board[key] ? state.draft[key] : null;
-      if (draftId) button.classList.add("cell-draft");
-      const mainObj = item.objects[key];
       const zoneLabel = labeledZones.has(region) ? "" : (labeledZones.add(region), regionName(item, region));
-      button.innerHTML = cellHtml(item, row, col, zoneLabel, draftId);
-      els.board.appendChild(button);
+      const suspectId = state.reveal ? solutionAt(item, row, col) : (state.mode === "editor" && state.editorMode === "solution" ? solutionAt(item, row, col) : state.board[key]);
+      const draftId = state.mode === "play" && !state.board[key] ? state.draft[key] : null;
+      const hasVictim = (state.mode === "editor" && item.victim.row === row && item.victim.col === col) ||
+        (state.mode === "play" && victimKey === key);
+      const checkClass = checkMap[key] || "";
+      const newState = `${suspectId || ""}|${draftId || ""}|${hasVictim ? "v" : ""}|${unavailable.has(key) ? "u" : ""}|${conflicts.has(key) ? "c" : ""}|${checkClass}`;
+
+      if (firstRender) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "cell";
+        button.dataset.row = String(row);
+        button.dataset.col = String(col);
+        button.style.setProperty("--region-color", COLORS[region % COLORS.length]);
+        { const texId = regionTexture(item, region); if (texId === "plain") { button.classList.add("texture-plain"); } else { const url = textureUrlFor(texId); if (url) button.style.backgroundImage = `url(${url})`; } }
+        button.classList.add(...cellBorderClasses(item, row, col, region));
+        button.title = regionName(item, region);
+        if (!cellCanBeOccupied(item, row, col)) button.classList.add("blocked");
+        if (unavailable.has(key)) button.classList.add("unavailable");
+        if (conflicts.has(key)) button.classList.add("conflict");
+        if (checkClass) button.classList.add(checkClass);
+        if (draftId) button.classList.add("cell-draft");
+        button.innerHTML = cellHtml(item, row, col, zoneLabel, draftId);
+        button.dataset.renderState = newState;
+        els.board.appendChild(button);
+      } else {
+        const button = els.board.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+        if (!button) continue;
+        if (button.dataset.renderState === newState) continue;
+        button.innerHTML = cellHtml(item, row, col, zoneLabel, draftId);
+        button.classList.toggle("unavailable", unavailable.has(key));
+        button.classList.toggle("conflict", conflicts.has(key));
+        button.classList.toggle("cell-draft", !!draftId);
+        button.classList.remove("correct", "wrong");
+        if (checkClass) button.classList.add(checkClass);
+        button.dataset.renderState = newState;
+      }
     }
   }
-  for (const [key, obj] of Object.entries(item.objects)) {
-    if (!obj || typeof obj !== "object" || obj.ref) continue;
-    const { w, h } = getObjectSize(obj);
-    const { w: sw, h: sh } = rotatedSize(w, h, obj.rotation);
-    if (sw <= 1 && sh <= 1) continue;
-    const [row, col] = key.split(",").map(Number);
-    const el = document.createElement("span");
-    const blocked = !objectCanBeOccupied(item, obj.id);
-    el.className = `cell-object board-object ${blocked ? "blocked-object" : "occupiable-object"}`;
-    el.title = objectLabel(item, obj.id);
-    el.innerHTML = objectIcon(obj.id, obj.color);
-    el.style.top = `calc(${row} * (var(--cell) + 1px) + 9px)`;
-    el.style.left = `calc(${col} * (var(--cell) + 1px) + 9px)`;
-    el.style.width = `calc(var(--cell) * ${sw} - 12px)`;
-    el.style.height = `calc(var(--cell) * ${sh} - 12px)`;
-    el.style.right = "auto";
-    el.style.bottom = "auto";
-    if (obj.rotation) el.style.setProperty("--obj-rotation", `${obj.rotation}deg`);
-    els.board.appendChild(el);
+  let objEl = els.board.querySelector(":scope > .board-object");
+  if (firstRender || colsChanged || !objEl) {
+    for (const old of els.board.querySelectorAll(":scope > .board-object")) old.remove();
+    for (const [key, obj] of Object.entries(item.objects)) {
+      if (!obj || typeof obj !== "object" || obj.ref) continue;
+      const { w, h } = getObjectSize(obj);
+      const { w: sw, h: sh } = rotatedSize(w, h, obj.rotation);
+      if (sw <= 1 && sh <= 1) continue;
+      const [row, col] = key.split(",").map(Number);
+      const el = document.createElement("span");
+      const blocked = !objectCanBeOccupied(item, obj.id);
+      el.className = `cell-object board-object ${blocked ? "blocked-object" : "occupiable-object"}`;
+      el.title = objectLabel(item, obj.id);
+      el.innerHTML = objectIcon(obj.id, obj.color);
+      el.style.top = `calc(${row} * (var(--cell) + 1px) + 9px)`;
+      el.style.left = `calc(${col} * (var(--cell) + 1px) + 9px)`;
+      el.style.width = `calc(var(--cell) * ${sw} - 12px)`;
+      el.style.height = `calc(var(--cell) * ${sh} - 12px)`;
+      el.style.right = "auto";
+      el.style.bottom = "auto";
+      if (obj.rotation) el.style.setProperty("--obj-rotation", `${obj.rotation}deg`);
+      els.board.appendChild(el);
+    }
   }
 }
 
@@ -296,14 +333,12 @@ export function renderSuspectCards() {
   els.suspectCards.innerHTML = victimCard + suspectCards;
   els.suspectCards.querySelector("[data-victim-piece]")?.addEventListener("click", () => {
     state.selectedSuspect = "__victim__";
-    renderBoard();
     renderSuspectCards();
     renderSelectedLabel();
   });
   els.suspectCards.querySelectorAll("[data-suspect]").forEach((button) => {
     button.addEventListener("click", () => {
       state.selectedSuspect = button.dataset.suspect;
-      renderBoard();
       renderSuspectCards();
       renderSelectedLabel();
     });
