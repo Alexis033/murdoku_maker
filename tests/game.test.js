@@ -19,6 +19,7 @@ vi.mock("../src/persist.js", () => ({
 
 import { state, els } from "../src/state.js";
 import { handleCellClick, lockCellPlacement, resetProgress, clearBoardPieces } from "../src/game.js";
+import { cellCanBeOccupied } from "../src/render.js";
 
 function makeCase(overrides = {}) {
   return {
@@ -122,6 +123,30 @@ describe("handleCellClick", () => {
     handleCellClick(2, 2);
     expect(state.victimGuess).toBe("");
   });
+  it("rejects draft on cell with blocked object", () => {
+    cellCanBeOccupied.mockReturnValueOnce(false);
+    state.selectedSuspect = "ana";
+    handleCellClick(1, 1);
+    expect(state.draft["1,1"]).toBeUndefined();
+  });
+  it("rejects draft on cell sharing row with locked suspect", () => {
+    state.board["1,0"] = "bruno";
+    state.selectedSuspect = "ana";
+    handleCellClick(1, 1);
+    expect(state.draft["1,1"]).toBeUndefined();
+  });
+  it("rejects draft on cell sharing column with locked suspect", () => {
+    state.board["0,1"] = "bruno";
+    state.selectedSuspect = "ana";
+    handleCellClick(1, 1);
+    expect(state.draft["1,1"]).toBeUndefined();
+  });
+  it("allows draft on different row and col when moving own suspect", () => {
+    state.board["0,0"] = "ana";
+    state.selectedSuspect = "ana";
+    handleCellClick(1, 1);
+    expect(state.draft["1,1"]).toBe("ana");
+  });
   it("can lock draft placement", () => {
     lockCellPlacement(1, 1, "ana");
     expect(state.board["1,1"]).toBe("ana");
@@ -163,6 +188,11 @@ describe("handleCellClick", () => {
     expect(state.draft["0,1"]).toBeUndefined();
   });
 
+  it("rejects lock on cell with blocked object", () => {
+    cellCanBeOccupied.mockReturnValueOnce(false);
+    lockCellPlacement(1, 1, "ana");
+    expect(state.board["1,1"]).toBeUndefined();
+  });
   it("does nothing when locking with no suspectId", () => {
     lockCellPlacement(2, 2);
     expect(state.board).toEqual({});
