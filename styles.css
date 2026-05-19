@@ -815,6 +815,7 @@ h2 {
 .board-object {
   position: absolute;
   z-index: 2;
+  pointer-events: none;
 }
 
 .cell-object {
