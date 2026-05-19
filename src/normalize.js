@@ -89,7 +89,6 @@ export function normalizeCase(input) {
   item.victim.col = clamp(Number(item.victim.col) || 0, 0, item.cols - 1);
   item.victim.clue = item.victim.clue || "";
   item.victim.gender = item.victim.gender || guessGender(item.victim.name);
-  item.victim.color = item.victim.color || AVATARS[6];
   item.suspects = normalizeSuspects(item.suspects || [], Math.min(MAX_SIZE, Math.max(item.rows, item.cols)));
   const oldClues = Array.isArray(item.clues) ? item.clues : [];
   item.suspects.forEach((suspect, i) => {

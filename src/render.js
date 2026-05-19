@@ -260,7 +260,7 @@ export function renderSuspectCards() {
   const item = currentCase();
   const victimCard = `
     <button class="suspect-card${state.selectedSuspect === "__victim__" ? " active" : ""}" data-victim-piece="true" type="button">
-      <div class="card-photo card-photo-victim" style="color:${escapeAttr(item.victim.color || "#c87868")}">${item.victim.gender === "male" ? MALE_SVG : FEMALE_SVG}</div>
+      <div class="card-photo card-photo-victim">${item.victim.gender === "male" ? MALE_SVG : FEMALE_SVG}</div>
       <div class="card-name">${escapeHtml(item.victim.name || "Victima")}</div>
       ${item.victim.clue ? `<div class="card-clue">${escapeHtml(item.victim.clue)}</div>` : ""}
     </button>
