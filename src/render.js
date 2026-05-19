@@ -235,8 +235,11 @@ export function renderBoard() {
       const draftId = state.mode === "play" && !state.board[key] ? state.draft[key] : null;
       const hasVictim = (state.mode === "editor" && item.victim.row === row && item.victim.col === col) ||
         (state.mode === "play" && victimKey === key);
+      const rawObject = item.objects[key];
+      const isMultiAnchor = rawObject && typeof rawObject === "object" && !rawObject.ref && ((rawObject.w || 1) > 1 || (rawObject.h || 1) > 1);
+      const cellObjId = rawObject && !isMultiAnchor && !rawObject.ref ? (rawObject.id || rawObject) : "";
       const checkClass = checkMap[key] || "";
-      const newState = `${suspectId || ""}|${draftId || ""}|${hasVictim ? "v" : ""}|${unavailable.has(key) ? "u" : ""}|${conflicts.has(key) ? "c" : ""}|${checkClass}`;
+      const newState = `${suspectId || ""}|${draftId || ""}|${hasVictim ? "v" : ""}|${unavailable.has(key) ? "u" : ""}|${conflicts.has(key) ? "c" : ""}|${checkClass}|${cellObjId}`;
 
       if (firstRender) {
         const button = document.createElement("button");
@@ -270,8 +273,22 @@ export function renderBoard() {
       }
     }
   }
-  let objEl = els.board.querySelector(":scope > .board-object");
-  if (firstRender || colsChanged || !objEl) {
+  function objHash(item) {
+    const parts = [];
+    for (const [key, obj] of Object.entries(item.objects)) {
+      if (!obj || typeof obj !== "object" || obj.ref) continue;
+      const { w, h } = getObjectSize(obj);
+      const { w: sw, h: sh } = rotatedSize(w, h, obj.rotation);
+      if (sw <= 1 && sh <= 1) continue;
+      parts.push(`${key}:${obj.id}:${sw}:${sh}:${obj.rotation || 0}:${obj.color || ""}`);
+    }
+    return parts.sort().join("|");
+  }
+  const prevObjHash = els.board.dataset.objHash;
+  const curObjHash = objHash(item);
+  const objectsChanged = curObjHash !== prevObjHash;
+  if (firstRender || colsChanged || objectsChanged) {
+    els.board.dataset.objHash = curObjHash;
     for (const old of els.board.querySelectorAll(":scope > .board-object")) old.remove();
     for (const [key, obj] of Object.entries(item.objects)) {
       if (!obj || typeof obj !== "object" || obj.ref) continue;
