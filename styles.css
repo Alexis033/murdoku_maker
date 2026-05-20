@@ -755,7 +755,9 @@ h2 {
 
 
 .cell:hover {
-  outline: 2px solid rgba(17,23,25,.35);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  filter: none;
 }
 
 .cell.blocked {
