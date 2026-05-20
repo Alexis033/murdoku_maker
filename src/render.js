@@ -422,7 +422,7 @@ export function renderPlayPanel() {
   renderSelectedLabel();
   updateTimerLabel();
   if (!state.lastCheck) {
-    setStatus(els.statusBox, "Ubica la victima y coloca cada sospechoso una sola vez por fila y columna.", "");
+    setStatus(els.statusBox, "Toca para colocar un borrador (ghost). Manten presionado para fijar el sospechoso (solido). La victima y los sospechosos fijados bloquean su fila y columna. Los borradores no bloquean.", "");
   }
 }
 
