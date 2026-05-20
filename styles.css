@@ -659,6 +659,8 @@ h2 {
   outline: 1px solid rgba(17,23,25,.16);
   outline-offset: -1px;
   padding: 4px;
+  min-height: 0;
+  max-height: var(--cell);
 }
 
 .press-ring {

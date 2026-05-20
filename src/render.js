@@ -190,13 +190,24 @@ export function cellHtml(item, row, col, zoneLabel, draft) {
   `;
 }
 
+let zoomInitialized = false;
+
 export function renderBoardSize() {
   const item = currentCase();
   const zoom = Number(els.zoomRange.value) || 68;
-  const largest = Math.max(item.rows, item.cols);
-  const auto = largest >= 14 ? 46 : largest >= 10 ? 54 : zoom;
-  const cellSize = state.mode === "editor" ? Math.min(zoom, 64) : auto;
-  els.board.style.setProperty("--cell", `${cellSize}px`);
+  const gap = 1;
+  const border = 8;
+  const stage = document.querySelector(".board-stage");
+  const availW = stage ? (stage.clientWidth - 36) : (window.innerWidth - 380);
+  const availH = stage ? (stage.clientHeight - 110) : (window.innerHeight - 280);
+  const fitFromW = (availW - border - (item.cols - 1) * gap) / item.cols;
+  const fitFromH = (availH - border - (item.rows - 1) * gap) / item.rows;
+  const minFit = Math.min(88, Math.max(12, Math.floor(Math.min(fitFromW, fitFromH))));
+  els.zoomRange.min = String(minFit);
+  const used = zoomInitialized ? Math.max(minFit, Math.min(zoom, 88)) : minFit;
+  if (used !== zoom) els.zoomRange.value = String(used);
+  els.board.style.setProperty("--cell", `${used}px`);
+  zoomInitialized = true;
 }
 
 export function renderBoard() {
